@@ -232,11 +232,6 @@ const ticketSchema = Joi.object({
    npx sequelize-cli db:migrate --env production
    ```
 
-### Build Command
-```bash
-npm install && npx sequelize-cli db:migrate --env production
-```
-
 ### Start Command
 ```bash
 npm start
