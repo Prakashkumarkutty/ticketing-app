@@ -1,7 +1,7 @@
 {
   "name": "backend",
   "version": "1.0.0",
-  "description": "",
+  "description": "Backend API for a ticketing system built with Node.js, Express, Sequelize, and PostgreSQL.",
   "main": "index.js",
   "scripts": {
     "dev": "nodemon server.js",
@@ -10,12 +10,13 @@
     "build": "npm install"
   },
   "keywords": [],
-  "author": "",
+  "author": "Prakash Kumar",
   "license": "ISC",
   "dependencies": {
     "cors": "^2.8.5",
     "dotenv": "^17.2.1",
     "express": "^5.1.0",
+    "joi": "^18.0.0",
     "pg": "^8.16.3",
     "sequelize": "^6.37.7",
     "uuid": "^11.1.0"

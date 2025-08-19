@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Container, Row, Col, Card, Button, Badge, Alert, Spinner, Modal } from 'react-bootstrap';
 import { useTickets } from '../context/TicketContext';
+import AppNavbar from './Navbar';
 
 function ViewTickets({ setCurrentPage }) {
     const { tickets, loading, error, updateTicket, fetchTickets } = useTickets();
@@ -12,20 +12,16 @@ function ViewTickets({ setCurrentPage }) {
         fetchTickets();
     }, [fetchTickets]);
 
-    const getPriorityColor = (priority) => {
-        switch (priority) {
-            case 'High': return 'danger';
-            case 'Medium': return 'warning';
-            default: return 'success';
-        }
+    const getPriorityClass = (priority) => {
+        return `priority-${priority.toLowerCase()}`;
     };
 
-    const getStatusColor = (status) => {
+    const getStatusClass = (status) => {
         switch (status) {
-            case 'Open': return 'primary';
-            case 'In Progress': return 'warning';
-            case 'Closed': return 'success';
-            default: return 'secondary';
+            case 'Open': return 'status-open';
+            case 'In Progress': return 'status-progress';
+            case 'Closed': return 'status-closed';
+            default: return 'status-open';
         }
     };
 
@@ -61,236 +57,246 @@ function ViewTickets({ setCurrentPage }) {
 
     if (loading) {
         return (
-            <Container className="text-center mt-5">
-                <Spinner animation="border" role="status" variant="primary">
-                    <span className="visually-hidden">Loading...</span>
-                </Spinner>
-                <p className="mt-3">Loading tickets...</p>
-            </Container>
+            <div className="gradient-bg min-vh-100">
+                <AppNavbar currentPage="view" setCurrentPage={setCurrentPage} />
+                <div className="container text-center py-5">
+                    <div className="spinner-custom d-inline-block" style={{ width: '3rem', height: '3rem' }}></div>
+                    <p className="text-white-custom mt-3 fs-5">Loading tickets...</p>
+                </div>
+            </div>
         );
     }
 
     return (
-        <Container className="mt-4">
-            <Row className="mb-4">
-                <Col>
-                    <div className="d-flex justify-content-between align-items-center flex-wrap">
-                        <h2>
-                            <i className="bi bi-ticket-perforated me-2"></i>
-                            Tickets
-                        </h2>
-                        <Button
-                            variant="primary"
-                            onClick={() => setCurrentPage('create')}
-                            className="mt-2 mt-md-0"
-                        >
-                            <i className="bi bi-plus-circle me-2"></i>
-                            New Ticket
-                        </Button>
-                    </div>
-                </Col>
-            </Row>
+        <div className="gradient-bg min-vh-100">
+            <AppNavbar currentPage="view" setCurrentPage={setCurrentPage} />
 
-            {error && (
-                <Alert variant="danger" className="mb-4">
-                    <i className="bi bi-exclamation-triangle me-2"></i>
-                    {error}
-                </Alert>
-            )}
-
-            {/* Filter Tabs */}
-            <Row className="mb-4">
-                <Col>
-                    <div className="d-flex flex-wrap gap-2">
-                        {[
-                            { key: 'all', label: 'All', count: ticketCounts.all },
-                            { key: 'open', label: 'Open', count: ticketCounts.open },
-                            { key: 'in_progress', label: 'In Progress', count: ticketCounts.in_progress },
-                            { key: 'closed', label: 'Closed', count: ticketCounts.closed }
-                        ].map(({ key, label, count }) => (
-                            <Button
-                                key={key}
-                                variant={filter === key ? 'primary' : 'outline-primary'}
-                                onClick={() => setFilter(key)}
-                                className="d-flex align-items-center"
+            <div className="container py-4">
+                <div className="row mb-4">
+                    <div className="col">
+                        <div className="d-flex justify-content-between align-items-center flex-wrap">
+                            <h2 className="text-white-custom fw-bold d-flex align-items-center">
+                                <i className="bi bi-ticket-perforated me-3" style={{ fontSize: '2rem' }}></i>
+                                Your Tickets
+                            </h2>
+                            <button
+                                className="btn btn-gradient-success mt-2 mt-md-0"
+                                onClick={() => setCurrentPage('create')}
                             >
-                                {label}
-                                <Badge bg={filter === key ? 'light' : 'primary'} text="dark" className="ms-2">
-                                    {count}
-                                </Badge>
-                            </Button>
+                                <i className="bi bi-plus-circle me-2"></i>
+                                New Ticket
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                {error && (
+                    <div className="alert-danger-custom mb-4">
+                        <i className="bi bi-exclamation-triangle me-2"></i>
+                        {error}
+                    </div>
+                )}
+
+                {/* Filter Buttons */}
+                <div className="row mb-4">
+                    <div className="col">
+                        <div className="d-flex flex-wrap gap-3">
+                            {[
+                                { key: 'all', label: 'All Tickets', count: ticketCounts.all },
+                                { key: 'open', label: 'Open', count: ticketCounts.open },
+                                { key: 'in_progress', label: 'In Progress', count: ticketCounts.in_progress },
+                                { key: 'closed', label: 'Closed', count: ticketCounts.closed }
+                            ].map(({ key, label, count }) => (
+                                <button
+                                    key={key}
+                                    className={`btn filter-btn d-flex align-items-center ${filter === key ? 'active' : ''}`}
+                                    onClick={() => setFilter(key)}
+                                >
+                                    {label}
+                                    <span className="badge-custom badge-light ms-2">
+                                        {count}
+                                    </span>
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+                </div>
+
+                {filteredTickets.length === 0 ? (
+                    <div className="card ticket-card text-center py-5 border-0">
+                        <div className="card-body">
+                            <i className="bi bi-inbox text-muted" style={{ fontSize: '4rem' }}></i>
+                            <h4 className="mt-3 text-muted">No tickets found</h4>
+                            <p className="text-muted">
+                                {filter === 'all'
+                                    ? "You haven't created any tickets yet."
+                                    : `No ${filter.replace('_', ' ')} tickets found.`
+                                }
+                            </p>
+                            {filter === 'all' && (
+                                <button className="btn btn-gradient-primary" onClick={() => setCurrentPage('create')}>
+                                    Create Your First Ticket
+                                </button>
+                            )}
+                        </div>
+                    </div>
+                ) : (
+                    <div className="row">
+                        {filteredTickets.map(ticket => (
+                            <div key={ticket.id} className="col-12 col-md-6 col-lg-4 mb-4">
+                                <div className="card ticket-card h-100 border-0">
+                                    <div className="card-header d-flex justify-content-between align-items-start bg-light border-0">
+                                        <div>
+                                            <span className={getPriorityClass(ticket.priority)}>
+                                                {ticket.priority}
+                                            </span>
+                                            <span className={`${getStatusClass(ticket.status)} ms-2`}>
+                                                {ticket.status}
+                                            </span>
+                                        </div>
+                                        <small className="text-muted">
+                                            {formatDate(ticket.created_at)}
+                                        </small>
+                                    </div>
+
+                                    <div className="card-body">
+                                        <h6 className="card-title mb-2 fw-bold" style={{
+                                            overflow: 'hidden',
+                                            textOverflow: 'ellipsis',
+                                            whiteSpace: 'nowrap'
+                                        }}>
+                                            {ticket.title}
+                                        </h6>
+                                        <p className="card-text small text-muted" style={{
+                                            overflow: 'hidden',
+                                            display: '-webkit-box',
+                                            WebkitLineClamp: 3,
+                                            WebkitBoxOrient: 'vertical'
+                                        }}>
+                                            {ticket.description}
+                                        </p>
+                                    </div>
+
+                                    <div className="card-footer bg-transparent border-0">
+                                        <div className="d-flex flex-wrap gap-2">
+                                            <button
+                                                className="btn btn-sm btn-outline-primary rounded-3"
+                                                onClick={() => {
+                                                    setSelectedTicket(ticket);
+                                                    setShowModal(true);
+                                                }}
+                                            >
+                                                <i className="bi bi-eye me-1"></i>
+                                                View
+                                            </button>
+
+                                            {ticket.status === 'Open' && (
+                                                <button
+                                                    className="btn btn-sm btn-gradient-warning"
+                                                    onClick={() => handleStatusUpdate(ticket.id, 'In Progress')}
+                                                >
+                                                    <i className="bi bi-play me-1"></i>
+                                                    Start
+                                                </button>
+                                            )}
+
+                                            {ticket.status === 'In Progress' && (
+                                                <button
+                                                    className="btn btn-sm btn-gradient-success"
+                                                    onClick={() => handleStatusUpdate(ticket.id, 'Closed')}
+                                                >
+                                                    <i className="bi bi-check me-1"></i>
+                                                    Close
+                                                </button>
+                                            )}
+
+                                            {ticket.status === 'Closed' && (
+                                                <button
+                                                    className="btn btn-sm btn-gradient-primary"
+                                                    onClick={() => handleStatusUpdate(ticket.id, 'Open')}
+                                                >
+                                                    <i className="bi bi-arrow-clockwise me-1"></i>
+                                                    Reopen
+                                                </button>
+                                            )}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         ))}
                     </div>
-                </Col>
-            </Row>
+                )}
 
-            {filteredTickets.length === 0 ? (
-                <Card className="text-center py-5">
-                    <Card.Body>
-                        <i className="bi bi-inbox" style={{ fontSize: '3rem', color: '#6c757d' }}></i>
-                        <h4 className="mt-3">No tickets found</h4>
-                        <p className="text-muted">
-                            {filter === 'all'
-                                ? "You haven't created any tickets yet."
-                                : `No ${filter.replace('_', ' ')} tickets found.`
-                            }
-                        </p>
-                        {filter === 'all' && (
-                            <Button variant="primary" onClick={() => setCurrentPage('create')}>
-                                Create Your First Ticket
-                            </Button>
-                        )}
-                    </Card.Body>
-                </Card>
-            ) : (
-                <Row>
-                    {filteredTickets.map(ticket => (
-                        <Col key={ticket.id} xs={12} md={6} lg={4} className="mb-4">
-                            <Card className="h-100 shadow-sm">
-                                <Card.Header className="d-flex justify-content-between align-items-start">
-                                    <div>
-                                        <Badge bg={getPriorityColor(ticket.priority)} className="me-2">
-                                            {ticket.priority}
-                                        </Badge>
-                                        <Badge bg={getStatusColor(ticket.status)}>
-                                            {ticket.status}
-                                        </Badge>
-                                    </div>
-                                    <small className="text-muted">
-                                        {formatDate(ticket.created_at)}
-                                    </small>
-                                </Card.Header>
+                {/* Ticket Detail Modal */}
+                {showModal && (
+                    <>
+                        <div className="modal-backdrop-custom" onClick={() => setShowModal(false)}></div>
+                        <div className="modal-custom">
+                            <div className="modal-content-custom">
+                                <div className="modal-header p-4 border-bottom">
+                                    <h5 className="modal-title fw-bold">Ticket Details</h5>
+                                    <button
+                                        type="button"
+                                        className="btn-close"
+                                        onClick={() => setShowModal(false)}
+                                        style={{ background: 'none', border: 'none', fontSize: '1.5rem' }}
+                                    >
+                                        ×
+                                    </button>
+                                </div>
+                                <div className="modal-body p-4">
+                                    {selectedTicket && (
+                                        <>
+                                            <div className="row mb-3">
+                                                <div className="col">
+                                                    <h5 className="fw-bold">{selectedTicket.title}</h5>
+                                                    <div className="mb-3">
+                                                        <span className={`${getPriorityClass(selectedTicket.priority)} me-2`}>
+                                                            {selectedTicket.priority} Priority
+                                                        </span>
+                                                        <span className={getStatusClass(selectedTicket.status)}>
+                                                            {selectedTicket.status}
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            </div>
 
-                                <Card.Body>
-                                    <Card.Title className="h6 mb-2" style={{
-                                        overflow: 'hidden',
-                                        textOverflow: 'ellipsis',
-                                        whiteSpace: 'nowrap'
-                                    }}>
-                                        {ticket.title}
-                                    </Card.Title>
-                                    <Card.Text className="small text-muted" style={{
-                                        overflow: 'hidden',
-                                        display: '-webkit-box',
-                                        WebkitLineClamp: 3,
-                                        WebkitBoxOrient: 'vertical'
-                                    }}>
-                                        {ticket.description}
-                                    </Card.Text>
-                                </Card.Body>
+                                            <div className="row mb-3">
+                                                <div className="col-sm-6">
+                                                    <strong>Created:</strong> {formatDate(selectedTicket.created_at)}
+                                                </div>
+                                                <div className="col-sm-6">
+                                                    <strong>Last Updated:</strong> {formatDate(selectedTicket.updated_at)}
+                                                </div>
+                                            </div>
 
-                                <Card.Footer className="bg-transparent">
-                                    <div className="d-flex flex-wrap gap-1">
-                                        <Button
-                                            size="sm"
-                                            variant="outline-info"
-                                            onClick={() => {
-                                                setSelectedTicket(ticket);
-                                                setShowModal(true);
-                                            }}
-                                        >
-                                            <i className="bi bi-eye me-1"></i>
-                                            View
-                                        </Button>
-
-                                        {ticket.status === 'Open' && (
-                                            <Button
-                                                size="sm"
-                                                variant="outline-warning"
-                                                onClick={() => handleStatusUpdate(ticket.id, 'In Progress')}
-                                            >
-                                                <i className="bi bi-play me-1"></i>
-                                                Start
-                                            </Button>
-                                        )}
-
-                                        {ticket.status === 'In Progress' && (
-                                            <Button
-                                                size="sm"
-                                                variant="outline-success"
-                                                onClick={() => handleStatusUpdate(ticket.id, 'Closed')}
-                                            >
-                                                <i className="bi bi-check me-1"></i>
-                                                Close
-                                            </Button>
-                                        )}
-
-                                        {ticket.status === 'Closed' && (
-                                            <Button
-                                                size="sm"
-                                                variant="outline-primary"
-                                                onClick={() => handleStatusUpdate(ticket.id, 'Open')}
-                                            >
-                                                <i className="bi bi-arrow-clockwise me-1"></i>
-                                                Reopen
-                                            </Button>
-                                        )}
-                                        {/* <select
-                                            className="form-select form-select-sm w-auto"
-                                            value={ticket.status}
-                                            onChange={(e) => handleStatusUpdate(ticket.id, e.target.value)}
-                                        >
-                                            <option value="Open">Open</option>
-                                            <option value="In Progress">In Progress</option>
-                                            <option value="Closed">Closed</option>
-                                        </select> */}
-                                    </div>
-                                </Card.Footer>
-                            </Card>
-                        </Col>
-                    ))}
-                </Row>
-            )}
-
-            {/* Ticket Detail Modal */}
-            <Modal show={showModal} onHide={() => setShowModal(false)} size="lg">
-                <Modal.Header closeButton>
-                    <Modal.Title>Ticket Details</Modal.Title>
-                </Modal.Header>
-                <Modal.Body>
-                    {selectedTicket && (
-                        <>
-                            <Row className="mb-3">
-                                <Col>
-                                    <h5>{selectedTicket.title}</h5>
-                                    <div className="mb-3">
-                                        <Badge bg={getPriorityColor(selectedTicket.priority)} className="me-2">
-                                            {selectedTicket.priority} Priority
-                                        </Badge>
-                                        <Badge bg={getStatusColor(selectedTicket.status)}>
-                                            {selectedTicket.status}
-                                        </Badge>
-                                    </div>
-                                </Col>
-                            </Row>
-
-                            <Row className="mb-3">
-                                <Col sm={6}>
-                                    <strong>Created:</strong> {formatDate(selectedTicket.created_at)}
-                                </Col>
-                                <Col sm={6}>
-                                    <strong>Last Updated:</strong> {formatDate(selectedTicket.updated_at)}
-                                </Col>
-                            </Row>
-
-                            <Row>
-                                <Col>
-                                    <strong>Description:</strong>
-                                    <div className="mt-2 p-3 bg-light rounded">
-                                        {selectedTicket.description}
-                                    </div>
-                                </Col>
-                            </Row>
-                        </>
-                    )}
-                </Modal.Body>
-                <Modal.Footer>
-                    <Button variant="secondary" onClick={() => setShowModal(false)}>
-                        Close
-                    </Button>
-                </Modal.Footer>
-            </Modal>
-        </Container>
+                                            <div className="row">
+                                                <div className="col">
+                                                    <strong>Description:</strong>
+                                                    <div className="mt-2 p-3 bg-light rounded" style={{ whiteSpace: 'pre-wrap' }}>
+                                                        {selectedTicket.description}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </>
+                                    )}
+                                </div>
+                                <div className="modal-footer p-4 border-top">
+                                    <button
+                                        type="button"
+                                        className="btn btn-secondary rounded-3"
+                                        onClick={() => setShowModal(false)}
+                                    >
+                                        Close
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </>
+                )}
+            </div>
+        </div>
     );
 }
+
 export default ViewTickets;

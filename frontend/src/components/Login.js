@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { Container, Row, Col, Card, Form, Button, Alert } from 'react-bootstrap';
 import { useTickets } from '../context/TicketContext';
 
 function Login({ setCurrentPage }) {
@@ -19,8 +18,6 @@ function Login({ setCurrentPage }) {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-
-
         if (formData.email && formData.password) {
             login({
                 name: 'Demo User',
@@ -33,60 +30,69 @@ function Login({ setCurrentPage }) {
     };
 
     return (
-        <Container className="mt-5">
-            <Row className="justify-content-center">
-                <Col xs={12} sm={8} md={6} lg={4}>
-                    <Card className="shadow">
-                        <Card.Body className="p-4">
-                            <div className="text-center mb-4">
-                                <i className="bi bi-ticket-perforated" style={{ fontSize: '3rem', color: '#0d6efd' }}></i>
-                                <h3 className="mt-2">Ticketing App</h3>
-                                <p className="text-muted">Sign in to manage your tickets</p>
-                            </div>
-
-                            {error && <Alert variant="danger">{error}</Alert>}
-
-                            <Form onSubmit={handleSubmit}>
-                                <Form.Group className="mb-3">
-                                    <Form.Label>Email Address</Form.Label>
-                                    <Form.Control
-                                        type="email"
-                                        name="email"
-                                        value={formData.email}
-                                        onChange={handleChange}
-                                        placeholder="Enter your email"
-                                        required
-                                    />
-                                </Form.Group>
-
-                                <Form.Group className="mb-4">
-                                    <Form.Label>Password</Form.Label>
-                                    <Form.Control
-                                        type="password"
-                                        name="password"
-                                        value={formData.password}
-                                        onChange={handleChange}
-                                        placeholder="Enter your password"
-                                        required
-                                    />
-                                </Form.Group>
-
-                                <Button type="submit" variant="primary" className="w-100 mb-3">
-                                    Sign In
-                                </Button>
-
-                                <div className="text-center">
-                                    <small className="text-muted">
-                                        Demo credentials are pre-filled
-                                    </small>
+        <div className="gradient-bg d-flex align-items-center justify-content-center p-4">
+            <div className="container">
+                <div className="row justify-content-center">
+                    <div className="col-12 col-sm-8 col-md-6 col-lg-4">
+                        <div className="card glass-card border-0">
+                            <div className="card-body p-5">
+                                <div className="text-center mb-4">
+                                    <div className="brand-icon d-inline-flex align-items-center justify-content-center">
+                                        <i className="bi bi-ticket-perforated text-white" style={{ fontSize: '2rem' }}></i>
+                                    </div>
+                                    <h1 className="text-white-custom fw-bold mb-2" style={{ fontSize: '2.5rem' }}>Ticket App</h1>
+                                    <p className="text-muted-custom">Streamline your support experience</p>
                                 </div>
-                            </Form>
-                        </Card.Body>
-                    </Card>
-                </Col>
-            </Row>
-        </Container>
+
+                                {error && (
+                                    <div className="alert-danger-custom">
+                                        {error}
+                                    </div>
+                                )}
+
+                                <form onSubmit={handleSubmit}>
+                                    <div className="mb-3">
+                                        <label className="form-label text-white-custom fw-medium">Email Address</label>
+                                        <input
+                                            type="email"
+                                            name="email"
+                                            value={formData.email}
+                                            onChange={handleChange}
+                                            placeholder="Enter your email"
+                                            required
+                                            className="form-control form-control-modern"
+                                        />
+                                    </div>
+
+                                    <div className="mb-4">
+                                        <label className="form-label text-white-custom fw-medium">Password</label>
+                                        <input
+                                            type="password"
+                                            name="password"
+                                            value={formData.password}
+                                            onChange={handleChange}
+                                            placeholder="Enter your password"
+                                            required
+                                            className="form-control form-control-modern"
+                                        />
+                                    </div>
+
+                                    <button type="submit" className="btn btn-gradient-primary w-100 py-3 fw-semibold mb-3">
+                                        Sign In
+                                    </button>
+
+                                    <div className="text-center">
+                                        <small className="text-muted-custom">Demo credentials are pre-filled</small>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     );
 }
+
 
 export default Login;

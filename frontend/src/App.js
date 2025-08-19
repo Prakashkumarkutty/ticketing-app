@@ -2,12 +2,11 @@ import React, { useState } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import { TicketProvider, useTickets } from './context/TicketContext';
-import AppNavbar from './components/Navbar';
 import Login from './components/Login';
 import CreateTicket from './components/Createticket';
 import ViewTickets from './components/Viewticket';
 import './App.css';
-
+import './styles/styles.css';
 function AppContent() {
   const [currentPage, setCurrentPage] = useState('login');
   const { user } = useTickets();
@@ -18,7 +17,7 @@ function AppContent() {
 
   return (
     <>
-      <AppNavbar currentPage={currentPage} setCurrentPage={setCurrentPage} />
+      {/* <AppNavbar currentPage={currentPage} setCurrentPage={setCurrentPage} /> */}
       {currentPage === 'view' && <ViewTickets setCurrentPage={setCurrentPage} />}
       {currentPage === 'create' && <CreateTicket setCurrentPage={setCurrentPage} />}
     </>
